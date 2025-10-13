@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import Navbar from './components/Navbar';
-import HomePage from './pages/HomePage';
-import DiscoverPage from './pages/DiscoverPage';
-import MoviesPage from './pages/MoviesPage';
-import TVShowsPage from './pages/TVShowsPage';
-import DetailPage from './pages/DetailPage';
-import FavoritesPage from './pages/FavoritesPage';
-import LoginPage from './pages/LoginPage';
-import { mockMovies, mockTVShows } from './data/mockData';
+import CineScopeNavbar from './frontend/components/Navbar';
+import HomePage from './frontend/pages/HomePage';
+import DiscoverPage from './frontend/pages/DiscoverPage';
+import MoviesPage from './frontend/pages/MoviesPage';
+import TVShowsPage from './frontend/pages/TVShowsPage';
+import DetailPage from './frontend/pages/DetailPage';
+import FavoritesPage from './frontend/pages/FavoritesPage';
+import LoginPage from './frontend/pages/LoginPage';
+import { mockMovies, mockTVShows } from './frontend/data/mockData';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -18,27 +18,23 @@ export default function App() {
 
   const allContent = [...mockMovies, ...mockTVShows];
 
-  // Handle favorite toggle
   const handleFavoriteToggle = (id) => {
     setFavorites(prev => 
       prev.includes(id) ? prev.filter(fav => fav !== id) : [...prev, id]
     );
   };
 
-  // Handle movie click
   const handleMovieClick = (movie) => {
     setSelectedMovie(movie);
     setCurrentPage('detail');
   };
 
-  // Handle login
   const handleLogin = (user) => {
     setUsername(user);
     setIsLoggedIn(true);
     setCurrentPage('home');
   };
 
-  // Handle navigation
   const handleNavigation = (page, data = null) => {
     setCurrentPage(page);
     if (data) setSelectedMovie(data);
@@ -46,9 +42,8 @@ export default function App() {
 
   return (
     <div style={{ background: '#0C0C0F', minHeight: '100vh' }}>
-      {/* Navbar (hidden on login page) */}
       {currentPage !== 'login' && (
-        <Navbar 
+        <CineScopeNavbar 
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
           isLoggedIn={isLoggedIn}
@@ -57,7 +52,6 @@ export default function App() {
         />
       )}
       
-      {/* Page Routing */}
       {currentPage === 'home' && (
         <HomePage 
           onNavigate={handleNavigation}
