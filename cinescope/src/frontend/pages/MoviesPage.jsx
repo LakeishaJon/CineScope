@@ -1,4 +1,3 @@
-// src/frontend/pages/MoviesPage.jsx
 import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Play } from 'lucide-react';
@@ -7,18 +6,20 @@ import { mockMovies } from '../data/mockData';
 
 export default function MoviesPage({ favorites, onFavoriteToggle, onMovieClick }) {
   return (
-    <div style={{ minHeight: '100vh', background: '#0C0C0F', paddingTop: '2rem', paddingBottom: '2rem' }}>
+    <div style={{ minHeight: '100vh', background: '#0C0C0F', paddingTop: '1.5rem', paddingBottom: '2rem' }}>
       <Container>
         {/* Header */}
-        <div className="mb-5">
-          <h1 className="text-white fw-bold display-4 mb-2">Movies</h1>
-          <p style={{ color: '#A0A3A8' }}>Browse our collection of films</p>
+        <div className="mb-4 mb-md-5 px-2">
+          <h1 className="text-white fw-bold display-5 display-md-4 mb-2">Movies</h1>
+          <p style={{ color: '#A0A3A8', fontSize: 'clamp(0.9rem, 2vw, 1rem)' }}>
+            Browse our collection of films
+          </p>
         </div>
 
         {/* Popular Movies */}
-        <div className="mb-5">
-          <h2 className="text-white fw-bold mb-4">Popular Movies</h2>
-          <Row xs={2} md={3} lg={6} className="g-3">
+        <div className="mb-4 mb-md-5">
+          <h2 className="text-white fw-bold mb-3 mb-md-4 px-2 fs-4 fs-md-3">Popular Movies</h2>
+          <Row xs={2} sm={3} md={4} lg={6} className="g-2 g-md-3">
             {mockMovies.map((movie) => (
               <Col key={movie.id}>
                 <MovieCard 
@@ -34,11 +35,11 @@ export default function MoviesPage({ favorites, onFavoriteToggle, onMovieClick }
 
         {/* Now Playing */}
         <div>
-          <h2 className="text-white fw-bold mb-4 d-flex align-items-center gap-2">
-            <Play size={24} style={{ color: '#FFB400' }} />
-            Now Playing in Theaters
+          <h2 className="text-white fw-bold mb-3 mb-md-4 d-flex align-items-center gap-2 px-2 fs-4 fs-md-3">
+            <Play size={20} style={{ color: '#FFB400' }} />
+            Now Playing
           </h2>
-          <Row xs={2} md={3} lg={6} className="g-3">
+          <Row xs={2} sm={3} md={4} lg={6} className="g-2 g-md-3">
             {mockMovies.slice(0, 6).map((movie) => (
               <Col key={movie.id}>
                 <MovieCard 

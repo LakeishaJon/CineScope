@@ -14,7 +14,7 @@ export default function LoginPage({ onLogin, onBack }) {
 
   return (
     <div className="login-container">
-      <Container>
+      <Container className="px-3">
         <div style={{ maxWidth: '450px', margin: '0 auto' }}>
           {/* Header */}
           <div className="text-center mb-4">
@@ -23,26 +23,26 @@ export default function LoginPage({ onLogin, onBack }) {
                 src="/CineScope logo.png" 
                 alt="CineScope Logo" 
                 style={{ 
-                  height: '100px', 
+                  height: 'clamp(50px, 10vw, 100px)', 
                   width: 'auto',
                   maxWidth: '300px',
                   transition: 'transform 0.3s ease'
-                 }}
-                 onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                 onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-               />
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              />
             </div>
-            <h1 className="text-white fw-bold mb-2">
+            <h1 className="text-white fw-bold mb-2 fs-3 fs-md-2">
               {isRegister ? 'Create Account' : 'Welcome Back'}
             </h1>
-            <p style={{ color: '#A0A3A8' }}>
+            <p style={{ color: '#A0A3A8', fontSize: 'clamp(0.9rem, 2vw, 1rem)' }}>
               {isRegister ? 'Join CineScope to save your favorites' : 'Sign in to continue to CineScope'}
             </p>
           </div>
 
           {/* Form Card */}
           <Card className="login-card border-0">
-            <Card.Body>
+            <Card.Body className="p-3 p-md-4">
               <Form>
                 <Form.Group className="mb-3">
                   <Form.Label className="text-white fw-semibold">Username</Form.Label>
@@ -68,7 +68,7 @@ export default function LoginPage({ onLogin, onBack }) {
 
                 <Button
                   onClick={handleSubmit}
-                  className="w-100 btn-gradient py-3 mb-3"
+                  className="w-100 btn-gradient py-2 py-md-3 mb-3"
                   size="lg"
                 >
                   {isRegister ? 'Register' : 'Login'}
@@ -80,7 +80,7 @@ export default function LoginPage({ onLogin, onBack }) {
                 <Button
                   variant="link"
                   onClick={() => setIsRegister(!isRegister)}
-                  style={{ color: '#A0A3A8', textDecoration: 'none' }}
+                  style={{ color: '#A0A3A8', textDecoration: 'none', fontSize: 'clamp(0.85rem, 2vw, 1rem)' }}
                 >
                   {isRegister ? 'Already have an account? ' : "Don't have an account? "}
                   <span style={{ color: '#FFB400', fontWeight: 'bold' }}>

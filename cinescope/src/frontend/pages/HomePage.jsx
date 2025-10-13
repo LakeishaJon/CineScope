@@ -29,20 +29,20 @@ export default function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
 
         <Container style={{ position: 'relative', zIndex: 1 }}>
           <div className="text-center">
-            <h1 className="display-1 fw-bold text-white mb-4">
+            <h1 className="display-3 display-md-1 fw-bold text-white mb-3 mb-md-4">
               Discover Movies
               <br />
               <span className="gradient-text">Beyond the Screen</span>
             </h1>
 
-            <p className="lead mx-auto mb-5" style={{ maxWidth: '600px', color: '#A0A3A8' }}>
+            <p className="lead mx-auto mb-4 mb-md-5 px-3" style={{ maxWidth: '600px', color: '#A0A3A8', fontSize: 'clamp(1rem, 2vw, 1.25rem)' }}>
               Explore trending films, rare gems, and recommendations tailored to your mood.
             </p>
 
-            <div className="d-flex justify-content-center gap-3 mb-5">
+            <div className="d-flex flex-column flex-sm-row justify-content-center gap-3 mb-5 px-3">
               <Button 
                 size="lg"
-                className="btn-gradient px-5 py-3"
+                className="btn-gradient px-4 px-md-5 py-3"
                 onClick={() => onNavigate('discover')}
               >
                 <TrendingUp size={20} className="me-2" />
@@ -51,7 +51,7 @@ export default function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
 
               <Button 
                 size="lg"
-                className="btn-outline-crimson px-5 py-3"
+                className="btn-outline-crimson px-4 px-md-5 py-3"
               >
                 <Play size={20} className="me-2" />
                 Watch Trailer
@@ -62,9 +62,9 @@ export default function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
       </div>
 
       {/* Feature Cards */}
-      <Container className="py-5">
-        <Row className="g-4">
-          <Col md={4}>
+      <Container className="py-4 py-md-5">
+        <Row className="g-3 g-md-4">
+          <Col xs={12} md={4}>
             <div className="feature-card" style={{ 
               background: 'linear-gradient(135deg, rgba(215, 38, 56, 0.1), rgba(26, 26, 29, 0.8))'
             }}>
@@ -76,7 +76,7 @@ export default function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
             </div>
           </Col>
 
-          <Col md={4}>
+          <Col xs={12} md={4}>
             <div className="feature-card" style={{ 
               background: 'linear-gradient(135deg, rgba(255, 180, 0, 0.1), rgba(26, 26, 29, 0.8))'
             }}>
@@ -88,7 +88,7 @@ export default function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
             </div>
           </Col>
 
-          <Col md={4}>
+          <Col xs={12} md={4}>
             <div className="feature-card" style={{ 
               background: 'linear-gradient(135deg, rgba(30, 144, 255, 0.1), rgba(26, 26, 29, 0.8))'
             }}>
@@ -103,21 +103,21 @@ export default function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
       </Container>
 
       {/* Trending Preview */}
-      <Container className="py-5">
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="text-white fw-bold">
+      <Container className="py-4 py-md-5">
+        <div className="d-flex justify-content-between align-items-center mb-4 px-2">
+          <h2 className="text-white fw-bold fs-3 fs-md-2">
             <span style={{ color: '#D72638' }}>🔥</span> Trending Now
           </h2>
           <Button 
             variant="link" 
-            className="text-white text-decoration-none"
+            className="text-white text-decoration-none p-0"
             onClick={() => onNavigate('discover')}
           >
             View All →
           </Button>
         </div>
         
-        <Row xs={2} md={3} lg={6} className="g-3">
+        <Row xs={2} sm={3} md={4} lg={6} className="g-2 g-md-3">
           {mockMovies.slice(0, 6).map((movie) => (
             <Col key={movie.id}>
               <MovieCard 
