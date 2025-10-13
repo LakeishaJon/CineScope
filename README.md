@@ -1,0 +1,2 @@
+# CineScope
+Movie Discovery App
