@@ -1,7 +1,13 @@
-function MoviesPage({ favorites, onFavoriteToggle, onMovieClick }) {
+import React from 'react';
+import { Play } from 'lucide-react';
+import MovieCard from '../components/MovieCard';
+import { mockMovies } from '../data/mockData';
+
+export default function MoviesPage({ favorites, onFavoriteToggle, onMovieClick }) {
   return (
     <div className="min-h-screen px-8 py-8" style={{ background: '#0C0C0F' }}>
       <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Movies</h1>
           <p style={{ color: '#A0A3A8' }}>Browse our collection of films</p>

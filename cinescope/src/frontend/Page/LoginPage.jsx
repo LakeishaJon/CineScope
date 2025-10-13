@@ -1,4 +1,7 @@
-function LoginPage({ onLogin, onBack }) {
+import React, { useState } from 'react';
+import { Film } from 'lucide-react';
+
+export default function LoginPage({ onLogin, onBack }) {
   const [isRegister, setIsRegister] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -10,9 +13,12 @@ function LoginPage({ onLogin, onBack }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-8" 
-      style={{ background: 'linear-gradient(135deg, #0C0C0F 0%, #1A1A1D 50%, #2D1A1F 100%)' }}>
+    <div 
+      className="min-h-screen flex items-center justify-center px-8" 
+      style={{ background: 'linear-gradient(135deg, #0C0C0F 0%, #1A1A1D 50%, #2D1A1F 100%)' }}
+    >
       <div className="w-full max-w-md">
+        {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="relative w-12 h-12">
@@ -28,6 +34,7 @@ function LoginPage({ onLogin, onBack }) {
           </p>
         </div>
 
+        {/* Form */}
         <div className="space-y-4">
           <div>
             <label className="block text-white mb-2 text-sm font-medium">Username</label>
@@ -71,6 +78,7 @@ function LoginPage({ onLogin, onBack }) {
           </button>
         </div>
 
+        {/* Toggle Login/Register */}
         <div className="text-center mt-6">
           <button
             onClick={() => setIsRegister(!isRegister)}
@@ -84,6 +92,7 @@ function LoginPage({ onLogin, onBack }) {
           </button>
         </div>
 
+        {/* Back Button */}
         <button
           onClick={onBack}
           className="w-full mt-4 py-3 rounded-lg font-medium transition"

@@ -1,8 +1,14 @@
-function Navbar({ currentPage, setCurrentPage, isLoggedIn, setIsLoggedIn, username }) {
+import React from 'react';
+import { Film, Home, Tv, Heart, User, LogOut } from 'lucide-react';
+
+export default function Navbar({ currentPage, setCurrentPage, isLoggedIn, setIsLoggedIn, username }) {
   return (
-    <nav className="flex items-center justify-between px-8 py-6 border-b sticky top-0 z-50 backdrop-blur-md" 
-      style={{ borderColor: '#A0A3A8' + '20', background: 'rgba(12, 12, 15, 0.95)' }}>
+    <nav 
+      className="flex items-center justify-between px-8 py-6 border-b sticky top-0 z-50 backdrop-blur-md" 
+      style={{ borderColor: '#A0A3A8' + '20', background: 'rgba(12, 12, 15, 0.95)' }}
+    >
       <div className="flex items-center gap-8">
+        {/* Logo */}
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => setCurrentPage('home')}>
           <div className="relative w-10 h-10">
             <div className="absolute inset-0 rounded-full" style={{ background: 'linear-gradient(135deg, #D72638, #FFB400)' }}></div>
@@ -17,28 +23,49 @@ function Navbar({ currentPage, setCurrentPage, isLoggedIn, setIsLoggedIn, userna
           </span>
         </div>
         
+        {/* Navigation Links */}
         <div className="flex items-center gap-6">
-          <button onClick={() => setCurrentPage('home')} className={`flex items-center gap-2 transition ${currentPage === 'home' ? 'text-white' : 'text-gray-400 hover:text-white'}`}>
+          <button 
+            onClick={() => setCurrentPage('home')} 
+            className={`flex items-center gap-2 transition ${currentPage === 'home' ? 'text-white' : 'text-gray-400 hover:text-white'}`}
+          >
             <Home size={18} />
             Home
           </button>
-          <button onClick={() => setCurrentPage('discover')} className={`transition ${currentPage === 'discover' ? 'text-white' : 'text-gray-400 hover:text-white'}`}>
+          
+          <button 
+            onClick={() => setCurrentPage('discover')} 
+            className={`transition ${currentPage === 'discover' ? 'text-white' : 'text-gray-400 hover:text-white'}`}
+          >
             Discover
           </button>
-          <button onClick={() => setCurrentPage('movies')} className={`transition ${currentPage === 'movies' ? 'text-white' : 'text-gray-400 hover:text-white'}`}>
+          
+          <button 
+            onClick={() => setCurrentPage('movies')} 
+            className={`transition ${currentPage === 'movies' ? 'text-white' : 'text-gray-400 hover:text-white'}`}
+          >
             Movies
           </button>
-          <button onClick={() => setCurrentPage('tvshows')} className={`flex items-center gap-2 transition ${currentPage === 'tvshows' ? 'text-white' : 'text-gray-400 hover:text-white'}`}>
+          
+          <button 
+            onClick={() => setCurrentPage('tvshows')} 
+            className={`flex items-center gap-2 transition ${currentPage === 'tvshows' ? 'text-white' : 'text-gray-400 hover:text-white'}`}
+          >
             <Tv size={18} />
             TV Shows
           </button>
-          <button onClick={() => setCurrentPage('favorites')} className={`flex items-center gap-2 transition ${currentPage === 'favorites' ? 'text-white' : 'text-gray-400 hover:text-white'}`}>
+          
+          <button 
+            onClick={() => setCurrentPage('favorites')} 
+            className={`flex items-center gap-2 transition ${currentPage === 'favorites' ? 'text-white' : 'text-gray-400 hover:text-white'}`}
+          >
             <Heart size={18} />
             Favorites
           </button>
         </div>
       </div>
       
+      {/* Auth Section */}
       <div className="flex items-center gap-4">
         {isLoggedIn ? (
           <>

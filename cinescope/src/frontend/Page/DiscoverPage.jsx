@@ -1,7 +1,12 @@
+import React, { useState } from 'react';
+import { Search, Filter } from 'lucide-react';
+import MovieCard from '../components/MovieCard';
+import { mockMovies, mockTVShows, genres } from '../data/mockData';
 
-function DiscoverPage({ favorites, onFavoriteToggle, onMovieClick }) {
+export default function DiscoverPage({ favorites, onFavoriteToggle, onMovieClick }) {
   const [selectedGenre, setSelectedGenre] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  
   const allContent = [...mockMovies, ...mockTVShows];
 
   const filteredContent = allContent.filter(item => {
@@ -56,7 +61,7 @@ function DiscoverPage({ favorites, onFavoriteToggle, onMovieClick }) {
           ))}
         </div>
 
-        {/* Results */}
+        {/* Results Count */}
         <div className="mb-4">
           <p style={{ color: '#A0A3A8' }}>
             {filteredContent.length} results found
@@ -64,19 +69,19 @@ function DiscoverPage({ favorites, onFavoriteToggle, onMovieClick }) {
         </div>
 
         {/* Movie Grid */}
-        <div className="grid grid-cols-6 gap-4">
-          {filteredContent.map((item) => (
-            <MovieCard 
-              key={item.id}
-              movie={item}
-              isFavorite={favorites.includes(item.id)}
-              onFavoriteToggle={onFavoriteToggle}
-              onClick={() => onMovieClick(item)}
-            />
-          ))}
-        </div>
-
-        {filteredContent.length === 0 && (
+        {filteredContent.length > 0 ? (
+          <div className="grid grid-cols-6 gap-4">
+            {filteredContent.map((item) => (
+              <MovieCard 
+                key={item.id}
+                movie={item}
+                isFavorite={favorites.includes(item.id)}
+                onFavoriteToggle={onFavoriteToggle}
+                onClick={() => onMovieClick(item)}
+              />
+            ))}
+          </div>
+        ) : (
           <div className="text-center py-20">
             <p className="text-2xl" style={{ color: '#A0A3A8' }}>No results found</p>
             <p style={{ color: '#A0A3A8' }} className="mt-2">Try adjusting your filters or search query</p>

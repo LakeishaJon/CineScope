@@ -1,8 +1,14 @@
-function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
+import React from 'react';
+import { TrendingUp, Star, Heart, Play } from 'lucide-react';
+import MovieCard from '../components/MovieCard';
+import { mockMovies } from '../data/mockData';
+
+export default function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #0C0C0F 0%, #1A1A1D 50%, #2D1A1F 100%)' }}>
       {/* Hero Section */}
       <div className="relative px-8 pt-20 pb-32 overflow-hidden">
+        {/* Animated Background */}
         <div className="absolute inset-0 opacity-20">
           {[...Array(20)].map((_, i) => (
             <div
@@ -21,6 +27,7 @@ function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
           ))}
         </div>
 
+        {/* Hero Content */}
         <div className="relative max-w-4xl mx-auto text-center space-y-8">
           <h1 className="text-6xl font-bold text-white leading-tight">
             Discover Movies
@@ -38,6 +45,7 @@ function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
             Explore trending films, rare gems, and recommendations tailored to your mood.
           </p>
 
+          {/* CTA Buttons */}
           <div className="flex items-center justify-center gap-4 pt-6">
             <button
               onClick={() => onNavigate('discover')}
@@ -52,7 +60,8 @@ function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
               Start Exploring
             </button>
 
-            <button className="px-8 py-4 rounded-lg font-semibold text-lg flex items-center gap-2 transition-all hover:bg-opacity-10"
+            <button 
+              className="px-8 py-4 rounded-lg font-semibold text-lg flex items-center gap-2 transition-all hover:bg-opacity-10"
               style={{ 
                 border: '2px solid #D72638',
                 color: '#D72638',
@@ -69,7 +78,8 @@ function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
       {/* Feature Cards */}
       <div className="px-8 py-16 max-w-6xl mx-auto">
         <div className="grid grid-cols-3 gap-6">
-          <div className="p-6 rounded-xl backdrop-blur-sm transition-all hover:scale-105 cursor-pointer"
+          <div 
+            className="p-6 rounded-xl backdrop-blur-sm transition-all hover:scale-105 cursor-pointer"
             style={{ 
               background: 'linear-gradient(135deg, rgba(215, 38, 56, 0.1), rgba(26, 26, 29, 0.8))',
               border: '1px solid rgba(215, 38, 56, 0.2)'
@@ -82,7 +92,8 @@ function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
             </p>
           </div>
 
-          <div className="p-6 rounded-xl backdrop-blur-sm transition-all hover:scale-105 cursor-pointer"
+          <div 
+            className="p-6 rounded-xl backdrop-blur-sm transition-all hover:scale-105 cursor-pointer"
             style={{ 
               background: 'linear-gradient(135deg, rgba(255, 180, 0, 0.1), rgba(26, 26, 29, 0.8))',
               border: '1px solid rgba(255, 180, 0, 0.2)'
@@ -95,7 +106,8 @@ function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
             </p>
           </div>
 
-          <div className="p-6 rounded-xl backdrop-blur-sm transition-all hover:scale-105 cursor-pointer"
+          <div 
+            className="p-6 rounded-xl backdrop-blur-sm transition-all hover:scale-105 cursor-pointer"
             style={{ 
               background: 'linear-gradient(135deg, rgba(30, 144, 255, 0.1), rgba(26, 26, 29, 0.8))',
               border: '1px solid rgba(30, 144, 255, 0.2)'
