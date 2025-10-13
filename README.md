@@ -22,11 +22,10 @@ Layer	Technology
 - API	TMDB (The Movie Database API)
 - Deployment	Vercel (frontend) + Render / Supabase (backend & DB)
 
-⚙️ Setup Instructions
+# ⚙️ Setup Instructions
 1️⃣ Clone the Repository
 - git clone https://github.com/yourusername/cinescope.git
 - cd cinescope
-
 2️⃣ Install Dependencies
 # Backend:
 - cd backend
