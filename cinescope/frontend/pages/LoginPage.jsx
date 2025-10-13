@@ -1,16 +1,31 @@
 import React, { useState } from 'react';
 import { Container, Form, Button, Card } from 'react-bootstrap';
+import { authAPI } from './services/api';
+
 
 export default function LoginPage({ onLogin, onBack }) {
   const [isRegister, setIsRegister] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = () => {
-    if (username && password) {
-      onLogin(username);
+ const handleSubmit = async () => {
+  if (!username || !password) {
+    alert('Please fill in all fields');
+    return;
+  }
+
+  try {
+    const response = isRegister 
+      ? await authAPI.register({ username, email: `${username}@cinescope.com`, password })
+      : await authAPI.login({ username, password });
+
+    if (response.data.success) {
+      onLogin(response.data.user, response.data.token);
     }
-  };
+  } catch (error) {
+    alert(error.response?.data?.message || 'Authentication failed');
+  }
+};
 
   return (
     <div className="login-container">
