@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Container, Form, Button, Card } from 'react-bootstrap';
-import { authAPI } from './services/api';
+import { authAPI } from "../../src/services/api";
 
 
 export default function LoginPage({ onLogin, onBack }) {
   const [isRegister, setIsRegister] = useState(false);
+  const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -38,9 +39,9 @@ export default function LoginPage({ onLogin, onBack }) {
                 src="/CineScope logo.png" 
                 alt="CineScope Logo" 
                 style={{ 
-                  height: 'clamp(50px, 10vw, 100px)', 
+                  height: 'clamp(200px, 50vw, 200px)', 
                   width: 'auto',
-                  maxWidth: '300px',
+                  maxWidth: '400px',
                   transition: 'transform 0.3s ease'
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
@@ -69,6 +70,20 @@ export default function LoginPage({ onLogin, onBack }) {
                     className="form-control-dark"
                   />
                 </Form.Group>
+
+                 {/* Email field - only show when registering */}
+                {isRegister && (
+                  <Form.Group className="mb-3">
+                    <Form.Label className="text-white fw-semibold">Email</Form.Label>
+                    <Form.Control
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      className="form-control-dark"
+                    />
+                  </Form.Group>
+                )}
 
                 <Form.Group className="mb-4">
                   <Form.Label className="text-white fw-semibold">Password</Form.Label>
