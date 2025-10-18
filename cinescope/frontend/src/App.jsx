@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import CineScopeNavbar from '../frontend/components/Navbar';
-import HomePage from '../frontend/pages/HomePage';
-import DiscoverPage from '../frontend/pages/DiscoverPage';
-import MoviesPage from '../frontend/pages/MoviesPage';
-import TVShowsPage from '../frontend/pages/TVShowsPage';
-import DetailPage from '../frontend/pages/DetailPage';
-import FavoritesPage from '../frontend/pages/FavoritesPage';
-import LoginPage from '../frontend/pages/LoginPage';
+import CineScopeNavbar from './components/Navbar';
+import HomePage from './pages/HomePage';
+import DiscoverPage from './pages/DiscoverPage';
+import MoviesPage from './pages/MoviesPage';
+import TVShowsPage from './pages/TVShowsPage';
+import DetailPage from './pages/DetailPage';
+import FavoritesPage from './pages/FavoritesPage';
+import LoginPage from './pages/LoginPage';
 import { authAPI, favoritesAPI } from './services/api';
 
 export default function App() {

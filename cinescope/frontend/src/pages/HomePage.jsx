@@ -1,10 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { TrendingUp, Star, Heart, Play } from 'lucide-react';
 import MovieCard from '../components/MovieCard';
-import { mockMovies } from '../data/mockData';
+import { moviesAPI } from '../services/api';
 
 export default function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
+  const [trendingMovies, setTrendingMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchTrending = async () => {
+      try {
+        setLoading(true);
+        const response = await moviesAPI.getTrending();
+        setTrendingMovies(response.data.results || []);
+      } catch (err) {
+        console.error('Error fetching trending movies:', err);
+        setError('Failed to load movies');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTrending();
+  }, []);
+
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0C0C0F 0%, #1A1A1D 50%, #2D1A1F 100%)' }}>
       {/* Hero Section */}
@@ -117,18 +138,39 @@ export default function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
           </Button>
         </div>
         
-        <Row xs={2} sm={3} md={4} lg={6} className="g-2 g-md-3">
-          {mockMovies.slice(0, 6).map((movie) => (
-            <Col key={movie.id}>
-              <MovieCard 
-                movie={movie}
-                isFavorite={favorites.includes(movie.id)}
-                onFavoriteToggle={onFavoriteToggle}
-                onClick={() => onNavigate('detail', movie)}
-              />
-            </Col>
-          ))}
-        </Row>
+        {loading ? (
+          <div className="text-center py-5">
+            <div className="spinner-border text-danger" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <p className="text-white mt-3">Loading trending movies...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-5">
+            <p className="text-danger">{error}</p>
+            <Button onClick={() => window.location.reload()}>Try Again</Button>
+          </div>
+        ) : (
+          <Row xs={2} sm={3} md={4} lg={6} className="g-2 g-md-3">
+            {trendingMovies.slice(0, 6).map((movie) => (
+              <Col key={movie.id}>
+                <MovieCard 
+                  movie={{
+                    ...movie,
+                    title: movie.title || movie.name,
+                    poster: movie.poster_path 
+                      ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                      : 'https://via.placeholder.com/500x750?text=No+Image',
+                    rating: movie.vote_average
+                  }}
+                  isFavorite={favorites.includes(movie.id)}
+                  onFavoriteToggle={onFavoriteToggle}
+                  onClick={() => onNavigate('detail', movie)}
+                />
+              </Col>
+            ))}
+          </Row>
+        )}
       </Container>
     </div>
   );

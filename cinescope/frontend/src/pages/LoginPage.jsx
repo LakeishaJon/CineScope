@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Form, Button, Card } from 'react-bootstrap';
-import { authAPI } from "../../src/services/api";
+import { authAPI } from "../services/api";
 
 
 export default function LoginPage({ onLogin, onBack }) {
