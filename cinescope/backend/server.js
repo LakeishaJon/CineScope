@@ -12,11 +12,14 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
+// CORS - Allow all origins for development in Codespaces
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
-  credentials: true
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -42,7 +45,7 @@ app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`🎬 CineScope Backend running on port ${PORT}`);
   console.log(`📡 API URL: http://localhost:${PORT}/api`);
-  console.log(`📡 Frontend URL: ${process.env.FRONTEND_URL}`);
+  console.log(`🌍 Codespaces URL: https://orange-goldfish-pj6p5g7vqvv9f97vp-5000.app.github.dev/api`);
 });
 
 module.exports = app;
