@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Navbar, Nav, Container, Button, Offcanvas } from 'react-bootstrap';
 import { Home, Tv, Heart, User, LogOut, Menu } from 'lucide-react';
 
+
 export default function CineScopeNavbar({ currentPage, setCurrentPage, isLoggedIn, setIsLoggedIn, username }) {
   const [show, setShow] = useState(false);
 
@@ -22,7 +23,7 @@ export default function CineScopeNavbar({ currentPage, setCurrentPage, isLoggedI
           className="d-flex align-items-center gap-2 gap-md-3"
         >
           <img 
-            src="/CineScope logo.png" 
+            src="/CineScope-logo.png" 
             alt="CineScope Logo" 
             className="navbar-logo"
             style={{ 

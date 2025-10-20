@@ -36,7 +36,7 @@ export default function LoginPage({ onLogin, onBack }) {
           <div className="text-center mb-4">
             <div className="d-flex justify-content-center align-items-center mb-3">
               <img 
-                src="/CineScope logo.png" 
+                src="/CineScope-logo.png" 
                 alt="CineScope Logo" 
                 style={{ 
                   height: 'clamp(200px, 50vw, 200px)', 

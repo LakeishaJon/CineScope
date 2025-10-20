@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import CineScopeNavbar from './components/Navbar';
 import HomePage from './pages/HomePage';
 import DiscoverPage from './pages/DiscoverPage';
@@ -13,6 +13,7 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [favorites, setFavorites] = useState([]);
+  const [allContent, setAllContent] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(true);
@@ -36,12 +37,24 @@ export default function App() {
       const response = await favoritesAPI.getFavorites();
       const favoriteIds = response.data.data.map(fav => fav.tmdb_id);
       setFavorites(favoriteIds);
+      console.log('✅ Favorites loaded:', favoriteIds);
     } catch (error) {
-      console.error('Error loading favorites:', error);
+      console.error('❌ Error loading favorites:', error);
     }
   };
 
-  const handleFavoriteToggle = async (tmdbId, movieData) => {
+  // Memoize addToAllContent - prevents re-renders!
+  const addToAllContent = useCallback((newContent) => {
+    setAllContent(prev => {
+      const existingIds = new Set(prev.map(item => item.id));
+      const uniqueNewContent = newContent.filter(item => !existingIds.has(item.id));
+      if (uniqueNewContent.length === 0) return prev; // No changes needed
+      return [...prev, ...uniqueNewContent];
+    });
+  }, []);
+
+  // Memoize handleFavoriteToggle - prevents re-renders!
+  const handleFavoriteToggle = useCallback(async (tmdbId, movieData = null) => {
     if (!isLoggedIn) {
       alert('Please login to add favorites');
       setCurrentPage('login');
@@ -49,60 +62,98 @@ export default function App() {
     }
 
     try {
-      if (favorites.includes(tmdbId)) {
-        // Find the favorite ID and remove it
+      console.log('🔍 Toggle favorite for:', tmdbId);
+      
+      const isFavorite = favorites.includes(tmdbId);
+
+      if (isFavorite) {
+        // Remove from favorites
         const response = await favoritesAPI.getFavorites();
         const favorite = response.data.data.find(fav => fav.tmdb_id === tmdbId);
+        
         if (favorite) {
           await favoritesAPI.removeFavorite(favorite.id);
           setFavorites(prev => prev.filter(id => id !== tmdbId));
+          console.log('✅ Removed from favorites');
         }
       } else {
         // Add to favorites
-        await favoritesAPI.addFavorite({
+        // If movieData not provided, find it in allContent
+        if (!movieData) {
+          movieData = allContent.find(item => item.id === tmdbId);
+        }
+
+        if (!movieData) {
+          console.error('❌ Movie data not found for:', tmdbId);
+          alert('Unable to add to favorites. Please try again.');
+          return;
+        }
+
+        const favoriteData = {
           tmdb_id: tmdbId,
           title: movieData.title || movieData.name,
           poster_path: movieData.poster_path,
-          media_type: movieData.media_type || 'movie',
+          media_type: movieData.media_type || movieData.type || (movieData.name ? 'tv' : 'movie'),
           vote_average: movieData.vote_average,
           release_date: movieData.release_date || movieData.first_air_date
-        });
+        };
+
+        await favoritesAPI.addFavorite(favoriteData);
         setFavorites(prev => [...prev, tmdbId]);
+        console.log('✅ Added to favorites');
       }
     } catch (error) {
-      console.error('Error toggling favorite:', error);
-      alert('Error updating favorites');
+      console.error('❌ Error toggling favorite:', error);
+      console.error('Error details:', error.response?.data || error.message);
+      alert('Error updating favorites. Please try again.');
     }
-  };
+  }, [isLoggedIn, favorites, allContent]);
 
-  const handleMovieClick = (movie) => {
+  // Memoize handleMovieClick - prevents re-renders!
+  const handleMovieClick = useCallback((movie) => {
+    // Add movie to allContent when viewing details
+    addToAllContent([movie]);
     setSelectedMovie(movie);
     setCurrentPage('detail');
-  };
+  }, [addToAllContent]);
 
-  const handleLogin = async (user, token) => {
+  // Memoize handleLogin - prevents re-renders!
+  const handleLogin = useCallback(async (user, token) => {
     setUsername(user.username);
     setIsLoggedIn(true);
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
-    await loadFavorites();
+    
+    // Load favorites
+    try {
+      const response = await favoritesAPI.getFavorites();
+      const favoriteIds = response.data.data.map(fav => fav.tmdb_id);
+      setFavorites(favoriteIds);
+      console.log('✅ Favorites loaded:', favoriteIds);
+    } catch (error) {
+      console.error('❌ Error loading favorites:', error);
+    }
+    
     setCurrentPage('home');
-  };
+  }, []);
 
-  const handleLogout = () => {
+  // Memoize handleLogout - prevents re-renders!
+  const handleLogout = useCallback(() => {
     setIsLoggedIn(false);
     setUsername('');
     setFavorites([]);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setCurrentPage('home');
-  };
+  }, []);
 
-  const handleNavigation = (page, data = null) => {
+  // Memoize handleNavigation - prevents re-renders!
+  const handleNavigation = useCallback((page, data = null) => {
     setCurrentPage(page);
     if (data) setSelectedMovie(data);
-  };
+  }, []);
 
+  // Loading screen
   if (loading) {
     return (
       <div style={{ 
@@ -113,7 +164,12 @@ export default function App() {
         justifyContent: 'center',
         color: 'white'
       }}>
-        <h2>Loading...</h2>
+        <div className="text-center">
+          <div className="spinner-border text-danger mb-3" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <h2>Loading CineScope...</h2>
+        </div>
       </div>
     );
   }
@@ -135,6 +191,7 @@ export default function App() {
           onNavigate={handleNavigation}
           favorites={favorites}
           onFavoriteToggle={handleFavoriteToggle}
+          onContentLoaded={addToAllContent}
         />
       )}
       
@@ -143,6 +200,7 @@ export default function App() {
           favorites={favorites}
           onFavoriteToggle={handleFavoriteToggle}
           onMovieClick={handleMovieClick}
+          onContentLoaded={addToAllContent}
         />
       )}
       
@@ -151,6 +209,7 @@ export default function App() {
           favorites={favorites}
           onFavoriteToggle={handleFavoriteToggle}
           onMovieClick={handleMovieClick}
+          onContentLoaded={addToAllContent}
         />
       )}
       
@@ -159,6 +218,7 @@ export default function App() {
           favorites={favorites}
           onFavoriteToggle={handleFavoriteToggle}
           onMovieClick={handleMovieClick}
+          onContentLoaded={addToAllContent}
         />
       )}
       
@@ -174,6 +234,7 @@ export default function App() {
       {currentPage === 'favorites' && (
         <FavoritesPage 
           favorites={favorites}
+          allContent={allContent}
           onFavoriteToggle={handleFavoriteToggle}
           onMovieClick={handleMovieClick}
           isLoggedIn={isLoggedIn}

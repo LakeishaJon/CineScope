@@ -74,6 +74,19 @@ class TMDbService {
     const response = await tmdbApi.get('/genre/tv/list');
     return response.data;
   }
+
+
+// Get movie videos/trailers
+async getMovieVideos(movieId) {
+  const response = await tmdbApi.get(`/movie/${movieId}/videos`);
+  return response.data;
+}
+
+// Get TV show videos/trailers
+async getTVVideos(tvId) {
+  const response = await tmdbApi.get(`/tv/${tvId}/videos`);
+  return response.data;
+}
 }
 
 module.exports = new TMDbService();

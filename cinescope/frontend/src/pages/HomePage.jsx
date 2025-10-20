@@ -2,34 +2,95 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { TrendingUp, Star, Heart, Play } from 'lucide-react';
 import MovieCard from '../components/MovieCard';
+import MovieCardSkeleton from '../components/MovieCardSkeleton';
+import TrailerModal from '../components/TrailerModal';
 import { moviesAPI } from '../services/api';
 
-export default function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
+export default function HomePage({ onNavigate, favorites, onFavoriteToggle, onContentLoaded }) {
   const [trendingMovies, setTrendingMovies] = useState([]);
+  const [featuredMovie, setFeaturedMovie] = useState(null);
+  const [showTrailer, setShowTrailer] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchTrending = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
+        console.log('🔍 Fetching trending movies...');
+        
         const response = await moviesAPI.getTrending();
-        setTrendingMovies(response.data.results || []);
+        console.log('✅ Trending response:', response);
+        
+        const moviesData = response?.data?.data?.movies || response?.data?.data;
+        
+        if (moviesData && Array.isArray(moviesData)) {
+          setTrendingMovies(moviesData);
+          console.log('✅ Trending movies loaded:', moviesData.length);
+          
+          // Notify parent component if callback provided
+          if (onContentLoaded) {
+            onContentLoaded(moviesData);
+          }
+          
+          // Get featured movie with trailer
+          const firstMovie = moviesData[0];
+          if (firstMovie) {
+            try {
+              const detailsRes = await moviesAPI.getDetails(firstMovie.id, 'movie');
+              if (detailsRes.data?.success) {
+                setFeaturedMovie(detailsRes.data.data);
+                console.log('✅ Featured movie loaded with trailer:', detailsRes.data.data.trailerKey);
+              }
+            } catch (detailsErr) {
+              console.warn('⚠️ Could not load featured movie details:', detailsErr);
+              // Fallback to basic movie data
+              setFeaturedMovie(firstMovie);
+            }
+          }
+        } else {
+          console.warn('⚠️ Invalid trending response structure');
+          setTrendingMovies([]);
+        }
       } catch (err) {
-        console.error('Error fetching trending movies:', err);
+        console.error('❌ Error fetching trending movies:', err);
         setError('Failed to load movies');
       } finally {
-        setLoading(false);
+        // Small delay for smooth transition
+        setTimeout(() => setLoading(false), 300);
       }
     };
 
-    fetchTrending();
-  }, []);
+    fetchData();
+  }, [onContentLoaded]);
+
+  // Error State
+  if (error) {
+    return (
+      <div className="content-wrapper page-fade-in" style={{ 
+        minHeight: '100vh', 
+        background: 'linear-gradient(135deg, #0C0C0F 0%, #1A1A1D 50%, #2D1A1F 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div className="text-center">
+          <p className="text-danger fs-5 mb-3">{error}</p>
+          <Button className="btn-gradient" onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0C0C0F 0%, #1A1A1D 50%, #2D1A1F 100%)' }}>
+    <div className="content-wrapper" style={{ 
+      minHeight: '100vh', 
+      background: 'linear-gradient(135deg, #0C0C0F 0%, #1A1A1D 50%, #2D1A1F 100%)' 
+    }}>
       {/* Hero Section */}
-      <div className="hero-section">
+      <div className="hero-section page-fade-in">
         <div className="hero-animated-bg">
           {[...Array(20)].map((_, i) => (
             <div
@@ -56,7 +117,11 @@ export default function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
               <span className="gradient-text">Beyond the Screen</span>
             </h1>
 
-            <p className="lead mx-auto mb-4 mb-md-5 px-3" style={{ maxWidth: '600px', color: '#A0A3A8', fontSize: 'clamp(1rem, 2vw, 1.25rem)' }}>
+            <p className="lead mx-auto mb-4 mb-md-5 px-3" style={{ 
+              maxWidth: '600px', 
+              color: '#A0A3A8', 
+              fontSize: 'clamp(1rem, 2vw, 1.25rem)' 
+            }}>
               Explore trending films, rare gems, and recommendations tailored to your mood.
             </p>
 
@@ -73,6 +138,8 @@ export default function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
               <Button 
                 size="lg"
                 className="btn-outline-crimson px-4 px-md-5 py-3"
+                onClick={() => setShowTrailer(true)}
+                disabled={!featuredMovie?.trailerKey}
               >
                 <Play size={20} className="me-2" />
                 Watch Trailer
@@ -83,15 +150,19 @@ export default function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
       </div>
 
       {/* Feature Cards */}
-      <Container className="py-4 py-md-5">
+      <Container className="py-4 py-md-5 page-fade-in" style={{ animationDelay: '0.2s' }}>
         <Row className="g-3 g-md-4">
           <Col xs={12} md={4}>
             <div className="feature-card" style={{ 
-              background: 'linear-gradient(135deg, rgba(215, 38, 56, 0.1), rgba(26, 26, 29, 0.8))'
+              background: 'linear-gradient(135deg, rgba(215, 38, 56, 0.1), rgba(26, 26, 29, 0.8))',
+              padding: '2rem',
+              borderRadius: '1rem',
+              border: '1px solid rgba(215, 38, 56, 0.2)',
+              transition: 'transform 0.3s ease, box-shadow 0.3s ease'
             }}>
               <TrendingUp size={32} style={{ color: '#D72638' }} className="mb-3" />
               <h4 className="text-white mb-2">Trending Now</h4>
-              <p style={{ color: '#A0A3A8' }}>
+              <p style={{ color: '#A0A3A8', marginBottom: 0 }}>
                 Stay updated with the latest blockbusters and viral hits everyone's watching.
               </p>
             </div>
@@ -99,11 +170,15 @@ export default function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
 
           <Col xs={12} md={4}>
             <div className="feature-card" style={{ 
-              background: 'linear-gradient(135deg, rgba(255, 180, 0, 0.1), rgba(26, 26, 29, 0.8))'
+              background: 'linear-gradient(135deg, rgba(255, 180, 0, 0.1), rgba(26, 26, 29, 0.8))',
+              padding: '2rem',
+              borderRadius: '1rem',
+              border: '1px solid rgba(255, 180, 0, 0.2)',
+              transition: 'transform 0.3s ease, box-shadow 0.3s ease'
             }}>
               <Star size={32} style={{ color: '#FFB400' }} className="mb-3" />
               <h4 className="text-white mb-2">Rated Classics</h4>
-              <p style={{ color: '#A0A3A8' }}>
+              <p style={{ color: '#A0A3A8', marginBottom: 0 }}>
                 Discover timeless masterpieces with top ratings from critics and audiences.
               </p>
             </div>
@@ -111,11 +186,15 @@ export default function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
 
           <Col xs={12} md={4}>
             <div className="feature-card" style={{ 
-              background: 'linear-gradient(135deg, rgba(30, 144, 255, 0.1), rgba(26, 26, 29, 0.8))'
+              background: 'linear-gradient(135deg, rgba(30, 144, 255, 0.1), rgba(26, 26, 29, 0.8))',
+              padding: '2rem',
+              borderRadius: '1rem',
+              border: '1px solid rgba(30, 144, 255, 0.2)',
+              transition: 'transform 0.3s ease, box-shadow 0.3s ease'
             }}>
               <Heart size={32} style={{ color: '#1E90FF' }} className="mb-3" />
               <h4 className="text-white mb-2">Your Favorites</h4>
-              <p style={{ color: '#A0A3A8' }}>
+              <p style={{ color: '#A0A3A8', marginBottom: 0 }}>
                 Curate your personal collection and never lose track of what you love.
               </p>
             </div>
@@ -133,27 +212,34 @@ export default function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
             variant="link" 
             className="text-white text-decoration-none p-0"
             onClick={() => onNavigate('discover')}
+            style={{ fontSize: 'clamp(0.9rem, 2vw, 1rem)' }}
           >
             View All →
           </Button>
         </div>
         
         {loading ? (
-          <div className="text-center py-5">
-            <div className="spinner-border text-danger" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </div>
-            <p className="text-white mt-3">Loading trending movies...</p>
-          </div>
-        ) : error ? (
-          <div className="text-center py-5">
-            <p className="text-danger">{error}</p>
-            <Button onClick={() => window.location.reload()}>Try Again</Button>
-          </div>
-        ) : (
+          // Skeleton Loaders with staggered animation
           <Row xs={2} sm={3} md={4} lg={6} className="g-2 g-md-3">
-            {trendingMovies.slice(0, 6).map((movie) => (
-              <Col key={movie.id}>
+            {[...Array(6)].map((_, index) => (
+              <Col 
+                key={index}
+                className="page-fade-in"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <MovieCardSkeleton />
+              </Col>
+            ))}
+          </Row>
+        ) : (
+          // Movie Cards with staggered animation
+          <Row xs={2} sm={3} md={4} lg={6} className="g-2 g-md-3">
+            {trendingMovies.slice(0, 6).map((movie, index) => (
+              <Col 
+                key={movie.id}
+                className="page-fade-in"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
                 <MovieCard 
                   movie={{
                     ...movie,
@@ -172,6 +258,14 @@ export default function HomePage({ onNavigate, favorites, onFavoriteToggle }) {
           </Row>
         )}
       </Container>
+
+      {/* Trailer Modal */}
+      <TrailerModal 
+        show={showTrailer}
+        onHide={() => setShowTrailer(false)}
+        trailerKey={featuredMovie?.trailerKey}
+        title={featuredMovie?.title || featuredMovie?.name}
+      />
     </div>
   );
 }

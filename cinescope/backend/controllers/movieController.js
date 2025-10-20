@@ -91,15 +91,29 @@ exports.getNowPlaying = async (req, res) => {
 exports.getDetails = async (req, res) => {
   try {
     const { id } = req.params;
-    const { type = 'movie' } = req.query;
+    const { type } = req.query; // 'movie' or 'tv'
 
-    const data = type === 'tv' 
+    // Get basic details
+    const details = type === 'tv'
       ? await tmdbService.getTVDetails(id)
       : await tmdbService.getMovieDetails(id);
 
+    // Get videos/trailers
+    const videos = type === 'tv'
+      ? await tmdbService.getTVVideos(id)
+      : await tmdbService.getMovieVideos(id);
+
+    // Find official trailer (YouTube)
+    const trailer = videos.results.find(
+      video => video.type === 'Trailer' && video.site === 'YouTube'
+    ) || videos.results[0]; // Fallback to first video
+
     res.json({
       success: true,
-      data
+      data: {
+        ...details,
+        trailerKey: trailer?.key || null
+      }
     });
   } catch (error) {
     console.error('Get details error:', error);

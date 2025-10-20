@@ -63,7 +63,6 @@ export default function MovieCard({ movie, onFavoriteToggle, isFavorite, onClick
             }}
           />
         ) : (
-          // Fallback if image fails to load
           <div style={{
             width: '100%',
             height: '100%',
@@ -86,7 +85,7 @@ export default function MovieCard({ movie, onFavoriteToggle, isFavorite, onClick
               <Star size={12} fill="currentColor" />
               {rating}
             </Badge>
-            {year && (
+            {year && year !== 'N/A' && (
               <Badge bg="secondary" style={{ background: 'rgba(255, 255, 255, 0.2)' }}>
                 {year}
               </Badge>
@@ -109,14 +108,14 @@ export default function MovieCard({ movie, onFavoriteToggle, isFavorite, onClick
         <button
           onClick={(e) => {
             e.stopPropagation();
-            onFavoriteToggle(movie.id);
+            onFavoriteToggle(movie.id, movie);
           }}
           className={`favorite-btn ${isFavorite ? 'active' : ''}`}
           style={{
             position: 'absolute',
             top: '0.5rem',
             right: '0.5rem',
-            background: 'rgba(0, 0, 0, 0.6)',
+            background: isFavorite ? 'rgba(215, 38, 56, 0.9)' : 'rgba(0, 0, 0, 0.6)',
             border: 'none',
             borderRadius: '50%',
             width: '2.5rem',
@@ -126,10 +125,27 @@ export default function MovieCard({ movie, onFavoriteToggle, isFavorite, onClick
             justifyContent: 'center',
             cursor: 'pointer',
             transition: 'all 0.2s',
+            backdropFilter: 'blur(10px)',
             zIndex: 10
           }}
+          onMouseEnter={(e) => {
+            if (!isFavorite) {
+              e.currentTarget.style.background = 'rgba(215, 38, 56, 0.9)';
+              e.currentTarget.style.transform = 'scale(1.1)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isFavorite) {
+              e.currentTarget.style.background = 'rgba(0, 0, 0, 0.6)';
+              e.currentTarget.style.transform = 'scale(1)';
+            }
+          }}
         >
-          <Heart size={18} fill={isFavorite ? 'white' : 'none'} color="white" />
+          <Heart 
+            size={18} 
+            fill={isFavorite ? 'white' : 'none'} 
+            color="white" 
+          />
         </button>
       </div>
       
@@ -139,6 +155,7 @@ export default function MovieCard({ movie, onFavoriteToggle, isFavorite, onClick
           className="text-white mb-1" 
           style={{
             fontSize: 'clamp(0.75rem, 2vw, 0.875rem)',
+            fontWeight: '600',
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
@@ -149,7 +166,10 @@ export default function MovieCard({ movie, onFavoriteToggle, isFavorite, onClick
           {title}
         </h6>
         {genre && (
-          <small style={{ color: '#A0A3A8', fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)' }}>
+          <small style={{ 
+            color: '#A0A3A8', 
+            fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)' 
+          }}>
             {genre}
           </small>
         )}
