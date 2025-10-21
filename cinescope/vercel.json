@@ -1,9 +1,12 @@
 {
-  "version": 2,
-  "buildCommand": "cd cinescope/frontend && npm install && npm run build",
-  "outputDirectory": "cinescope/frontend/dist",
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist",
+  "installCommand": "cd frontend && npm install",
   "framework": "vite",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
