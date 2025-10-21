@@ -3,7 +3,6 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const authRoutes = require('./routes/authRoutes');
 const movieRoutes = require('./routes/movieRoutes');
 const favoriteRoutes = require('./routes/favoriteRoutes');
@@ -20,12 +19,12 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
   'https://orange-goldfish-pj6p5g7vqw9r97vp-5173.app.github.dev',
-  process.env.FRONTEND_URL // Add your Vercel URL here
+  process.env.FRONTEND_URL
 ].filter(Boolean);
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, Postman, etc.)
+    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
     // In development, allow all origins
@@ -38,6 +37,7 @@ app.use(cors({
       callback(null, true);
     } else {
       console.log('❌ CORS blocked:', origin);
+      console.log('📋 Allowed origins:', allowedOrigins);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -49,22 +49,22 @@ app.use(cors({
 // ============================================
 // MIDDLEWARE
 // ============================================
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Request logging in development
-if (NODE_ENV === 'development') {
-  app.use((req, res, next) => {
-    console.log(`${req.method} ${req.path}`);
-    next();
-  });
-}
+// Request logging middleware
+app.use((req, res, next) => {
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] ${req.method} ${req.path}`);
+  next();
+});
 
 // ============================================
-// API ROUTES
+// ROOT ENDPOINT
 // ============================================
 app.get('/', (req, res) => {
   res.json({ 
+    success: true,
     message: '🎬 CineScope API', 
     version: '1.0.0',
     status: 'running',
@@ -78,11 +78,9 @@ app.get('/', (req, res) => {
   });
 });
 
-app.use('/api/auth', authRoutes);
-app.use('/api/movies', movieRoutes);
-app.use('/api/favorites', favoriteRoutes);
-
-// Health check endpoint
+// ============================================
+// HEALTH CHECK
+// ============================================
 app.get('/api/health', (req, res) => {
   res.json({ 
     success: true,
@@ -99,30 +97,24 @@ app.get('/api/health', (req, res) => {
 });
 
 // ============================================
-// SERVE FRONTEND (Optional - for full-stack deployment)
+// API ROUTES
 // ============================================
-// Uncomment this section if deploying frontend + backend together
-/*
-if (NODE_ENV === 'production') {
-  // Serve static files from React build
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
-  
-  // Handle React routing - return index.html for all non-API routes
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
-  });
-}
-*/
+app.use('/api/auth', authRoutes);
+app.use('/api/movies', movieRoutes);
+app.use('/api/favorites', favoriteRoutes);
 
 // ============================================
 // ERROR HANDLING
 // ============================================
 // 404 handler for API routes
-app.use('/api/*', (req, res) => {
-  res.status(404).json({ 
-    success: false, 
-    message: `API route not found: ${req.originalUrl}` 
-  });
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ 
+      success: false, 
+      message: `API route not found: ${req.originalUrl}` 
+    });
+  }
+  next();
 });
 
 // General 404 handler
@@ -133,30 +125,36 @@ app.use((req, res) => {
   });
 });
 
-// Global error handler
+// Global error handler (must be last)
 app.use(errorHandler);
 
 // ============================================
 // START SERVER
 // ============================================
 const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log('\n' + '='.repeat(50));
+  console.log('\n' + '='.repeat(60));
   console.log('🎬  CineScope Backend Server');
-  console.log('='.repeat(50));
+  console.log('='.repeat(60));
   console.log(`📍 Environment:  ${NODE_ENV}`);
   console.log(`🚀 Port:         ${PORT}`);
   console.log(`✅ Status:       Running`);
-  console.log('='.repeat(50));
+  console.log(`🕐 Started:      ${new Date().toISOString()}`);
+  console.log('='.repeat(60));
   
   if (NODE_ENV === 'development') {
     console.log(`\n📡 Local API:    http://localhost:${PORT}/api`);
-    console.log(`🏥 Health check: http://localhost:${PORT}/api/health`);
+    console.log(`🏥 Health:       http://localhost:${PORT}/api/health`);
   } else {
-    console.log(`\n🌐 Production:   https://cinescope-backend-l93r.onrender.com`);
+    console.log(`\n🌐 Production:   ${process.env.RENDER_EXTERNAL_URL || 'N/A'}`);
     console.log(`🔗 Frontend:     ${process.env.FRONTEND_URL || 'Not configured'}`);
   }
   
-  console.log('\n' + '='.repeat(50) + '\n');
+  console.log(`\n🔧 Allowed Origins:`);
+  allowedOrigins.forEach(origin => {
+    console.log(`   ✓ ${origin}`);
+  });
+  
+  console.log('\n' + '='.repeat(60) + '\n');
 });
 
 // ============================================
@@ -167,27 +165,31 @@ const gracefulShutdown = (signal) => {
   
   server.close(() => {
     console.log('✅ HTTP server closed');
+    console.log('👋 Goodbye!');
     process.exit(0);
   });
   
-  // Force shutdown after 10 seconds
+  // Force shutdown after 10 seconds if connections don't close
   setTimeout(() => {
     console.error('❌ Could not close connections in time, forcefully shutting down');
     process.exit(1);
   }, 10000);
 };
 
+// Handle shutdown signals
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // Handle uncaught errors
 process.on('uncaughtException', (error) => {
-  console.error('❌ Uncaught Exception:', error);
+  console.error('❌ Uncaught Exception:', error.message);
+  console.error(error.stack);
   gracefulShutdown('uncaughtException');
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  console.error('❌ Unhandled Rejection at:', promise);
+  console.error('Reason:', reason);
   gracefulShutdown('unhandledRejection');
 });
 
